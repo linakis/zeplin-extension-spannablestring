@@ -1,0 +1,9 @@
+# Specifies intentionally untracked files to ignore when using Git
+# http://git-scm.com/docs/gitignore
+
+# IDE Files
+.idea/
+
+# OS Files
+.DS_Store
+Thumbs.db

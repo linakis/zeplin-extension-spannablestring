@@ -1,0 +1,12 @@
+{
+    "name": "Spannable Strings",
+    "description": "Generates SpannableString snippets from text layers with multiple styles.",
+    "version": "0.1.0",
+    "moduleURL": "index.js",
+    "author": {
+        "name": "Nikos Linakis",
+        "email": "nikos@linakis.net",
+        "url": "https://www.linakis.net"
+    },
+    "repository": "https://github.com/linakis/zeplin-extension-spannablestring"
+}
