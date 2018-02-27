@@ -3,14 +3,19 @@ function layer(context, layer) {
         return
     }
 
+    var styleGuideColor = false;
+    if (context.getOption("use_styleguide_colors")) {
+        styleGuideColor = context.getOption("use_styleguide_colors");
+    }
+
     var output = 'SpannableString spString = new SpannableString(' + JSON.stringify(layer.content) + ');\n';
     var superTextStyle = computeSuperTextStyle(layer);
 
-    output += spannify(superTextStyle.range, superTextStyle.textStyle, null, {});
+    output += spannify(superTextStyle.range, superTextStyle.textStyle, null, {}, colorDroid(superTextStyle.textStyle.color, styleGuideColor, context.project));
 
     for (var i in layer.textStyles) {
         var previousTextStyle = i > 0 ? layer.textStyles[i - 1].textStyle : null;
-        output += spannify(layer.textStyles[i].range, layer.textStyles[i].textStyle, previousTextStyle, superTextStyle.textStyle);
+        output += spannify(layer.textStyles[i].range, layer.textStyles[i].textStyle, previousTextStyle, superTextStyle.textStyle, colorDroid(layer.textStyles[i].textStyle.color, styleGuideColor, context.project));
     }
 
     return {
@@ -18,14 +23,15 @@ function layer(context, layer) {
         language: "java"
     };
 }
-function spannify(range, textStyle, appliedTextStyle, superTextStyle) {
+
+function spannify(range, textStyle, appliedTextStyle, superTextStyle, colorDroid) {
 
     appliedTextStyle = appliedTextStyle || {};
 
     var ret = "";
 
     if (!compare(textStyle, superTextStyle, "color") && !compare(textStyle, appliedTextStyle, "color")) {
-        ret += 'spString.setSpan(new ForegroundColorSpan(Color.parseColor("' + colorToHex(textStyle.color) + '")), ' + range.start + ', ' + range.end + ', Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);\n'
+        ret += 'spString.setSpan(new ForegroundColorSpan(' + colorDroid + '), ' + range.start + ', ' + range.end + ', Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);\n'
     }
 
     if (!compare(textStyle, superTextStyle, "fontFace") && !compare(textStyle, appliedTextStyle, "fontFace")) {
@@ -47,12 +53,22 @@ function spannify(range, textStyle, appliedTextStyle, superTextStyle) {
     return ret;
 }
 
+function colorDroid(color, useStyleGuideColor, projectContext) {
+    if (useStyleGuideColor) {
+        var styleGuideColor = projectContext.findColorEqual(color);
+        if(styleGuideColor && styleGuideColor.name) {
+            return 'ContextCompat.getColor(context, R.color.' + styleGuideColor.name + ')';
+        }
+    }
+    return 'Color.parseColor("' + colorToHex(color) + '")';
+}
+
 function compare(left, right, attr) {
 
     left = left || {};
     right = right || {};
 
-    if(attr == "color" && left[attr] != null && right[attr] != null) {
+    if (attr == "color" && left[attr] != null && right[attr] != null) {
         return left[attr].a === right[attr].a
             && left[attr].r === right[attr].r
             && left[attr].g === right[attr].g
@@ -75,7 +91,6 @@ function colorToHex(color) {
     }
     return ""
 }
-
 
 function computeSuperTextStyle(layer) {
     if (!shouldShowExtension) {
@@ -100,7 +115,7 @@ function computeSuperTextStyle(layer) {
         }
     };
 
-    for (var i=0; i < layer.textStyles.length; ++i) {
+    for (var i = 0; i < layer.textStyles.length; ++i) {
         if (!compare(superTextStyle.textStyle, layer.textStyles[i].textStyle, "fontSize")) {
             delete superTextStyle.textStyle.fontSize
         }

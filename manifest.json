@@ -8,5 +8,13 @@
         "email": "nikos@linakis.net",
         "url": "https://www.linakis.net"
     },
-    "repository": "https://github.com/linakis/zeplin-extension-spannablestring"
+    "repository": "https://github.com/linakis/zeplin-extension-spannablestring",
+    "options": [
+        {
+            "name": "Use Styleguide color names",
+            "type": "switch",
+            "id": "use_styleguide_colors",
+            "default": true
+        }
+    ]
 }
