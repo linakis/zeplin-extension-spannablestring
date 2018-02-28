@@ -8,14 +8,16 @@ function layer(context, layer) {
         styleGuideColor = context.getOption("use_styleguide_colors");
     }
 
-    var output = 'SpannableString spString = new SpannableString(' + JSON.stringify(layer.content) + ');\n';
+    var projectColors = mapProjectColors(context.project.colors);
     var superTextStyle = computeSuperTextStyle(layer);
 
-    output += spannify(superTextStyle.range, superTextStyle.textStyle, null, {}, colorDroid(superTextStyle.textStyle.color, styleGuideColor, context.project));
+    var output = 'SpannableString spString = new SpannableString(' + JSON.stringify(layer.content) + ');\n';
+
+    output += spannify(superTextStyle.range, superTextStyle.textStyle, null, {}, colorDroid(superTextStyle.textStyle.color, styleGuideColor, projectColors));
 
     for (var i in layer.textStyles) {
         var previousTextStyle = i > 0 ? layer.textStyles[i - 1].textStyle : null;
-        output += spannify(layer.textStyles[i].range, layer.textStyles[i].textStyle, previousTextStyle, superTextStyle.textStyle, colorDroid(layer.textStyles[i].textStyle.color, styleGuideColor, context.project));
+        output += spannify(layer.textStyles[i].range, layer.textStyles[i].textStyle, previousTextStyle, superTextStyle.textStyle, colorDroid(layer.textStyles[i].textStyle.color, styleGuideColor, projectColors));
     }
 
     return {
@@ -53,9 +55,10 @@ function spannify(range, textStyle, appliedTextStyle, superTextStyle, colorDroid
     return ret;
 }
 
-function colorDroid(color, useStyleGuideColor, projectContext) {
-    if (useStyleGuideColor) {
-        var styleGuideColor = projectContext.findColorEqual(color);
+function colorDroid(color, useStyleGuideColor, projectColors) {
+
+    if (useStyleGuideColor && projectColors) {
+        var styleGuideColor = findColor(color, projectColors);
         if(styleGuideColor && styleGuideColor.name) {
             return 'ContextCompat.getColor(context, R.color.' + styleGuideColor.name + ')';
         }
@@ -68,14 +71,33 @@ function compare(left, right, attr) {
     left = left || {};
     right = right || {};
 
-    if (attr == "color" && left[attr] != null && right[attr] != null) {
-        return left[attr].a === right[attr].a
-            && left[attr].r === right[attr].r
-            && left[attr].g === right[attr].g
-            && left[attr].b === right[attr].b
+    if (attr == "color") {
+        return colorEqual(left[attr], right[attr]);
     }
 
     return left[attr] == right[attr];
+}
+
+function mapProjectColors(projectColors) {
+    var dict = {};
+
+    for (var i in projectColors) {
+        dict[colorToHex(projectColors[i])] = projectColors[i];
+    }
+
+    return dict;
+}
+
+function findColor(color, inProjectColors) {
+    return inProjectColors[colorToHex(color)];
+}
+
+function colorEqual(left, right) {
+    return left != null && right != null
+        && left.r === right.r
+        && left.g === right.g
+        && left.b === right.b
+        && left.a === right.a;
 }
 
 // no point in showing Spannable logic
