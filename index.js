@@ -13,11 +13,10 @@ function layer(context, layer) {
 
     var output = 'SpannableString spString = new SpannableString(' + JSON.stringify(layer.content) + ');\n';
 
-    output += spannify(superTextStyle.range, superTextStyle.textStyle, null, {}, colorDroid(superTextStyle.textStyle.color, styleGuideColor, projectColors));
+    output += spannify(superTextStyle.range, superTextStyle.textStyle, {}, colorDroid(superTextStyle.textStyle.color, styleGuideColor, projectColors));
 
     for (var i in layer.textStyles) {
-        var previousTextStyle = i > 0 ? layer.textStyles[i - 1].textStyle : null;
-        output += spannify(layer.textStyles[i].range, layer.textStyles[i].textStyle, previousTextStyle, superTextStyle.textStyle, colorDroid(layer.textStyles[i].textStyle.color, styleGuideColor, projectColors));
+        output += spannify(layer.textStyles[i].range, layer.textStyles[i].textStyle, superTextStyle.textStyle, colorDroid(layer.textStyles[i].textStyle.color, styleGuideColor, projectColors));
     }
 
     return {
@@ -26,21 +25,19 @@ function layer(context, layer) {
     };
 }
 
-function spannify(range, textStyle, appliedTextStyle, superTextStyle, colorDroid) {
-
-    appliedTextStyle = appliedTextStyle || {};
+function spannify(range, textStyle, superTextStyle, colorDroid) {
 
     var ret = "";
 
-    if (!compare(textStyle, superTextStyle, "color") && !compare(textStyle, appliedTextStyle, "color")) {
+    if (!compare(textStyle, superTextStyle, "color") && colorDroid) {
         ret += 'spString.setSpan(new ForegroundColorSpan(' + colorDroid + '), ' + range.start + ', ' + range.end + ', Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);\n'
     }
 
-    if (!compare(textStyle, superTextStyle, "fontFace") && !compare(textStyle, appliedTextStyle, "fontFace")) {
+    if (!compare(textStyle, superTextStyle, "fontFace")) {
         ret += 'spString.setSpan(new TypefaceSpan("' + textStyle.fontFace + '"), ' + range.start + ', ' + range.end + ', Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);\n'
     }
 
-    if (!compare(textStyle, superTextStyle, "fontSize") && !compare(textStyle, appliedTextStyle, "fontSize")) {
+    if (!compare(textStyle, superTextStyle, "fontSize")) {
         ret += 'spString.setSpan(new AbsoluteSizeSpan(' + Math.round(textStyle.fontSize) + '), ' + range.start + ', ' + range.end + ', Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);\n'
     }
 
@@ -56,6 +53,9 @@ function spannify(range, textStyle, appliedTextStyle, superTextStyle, colorDroid
 }
 
 function colorDroid(color, useStyleGuideColor, projectColors) {
+    if(!color) {
+        return false;
+    }
 
     if (useStyleGuideColor && projectColors) {
         var styleGuideColor = findColor(color, projectColors);
@@ -111,7 +111,7 @@ function colorToHex(color) {
     if (color) {
         return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
     }
-    return ""
+    return false
 }
 
 function computeSuperTextStyle(layer) {
