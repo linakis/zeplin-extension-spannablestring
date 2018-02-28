@@ -41,14 +41,6 @@ function spannify(range, textStyle, superTextStyle, colorDroid) {
         ret += 'spString.setSpan(new AbsoluteSizeSpan(' + Math.round(textStyle.fontSize) + '), ' + range.start + ', ' + range.end + ', Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);\n'
     }
 
-    // TODO: AlignmentSpan -> textAlign,
-    // TODO: UnderlineSpan -> fontStyle,
-    // TODO: BackgroundColorSpan -> ?,
-    // TODO: StrikethroughSpan -> ?,
-    // TODO: LineHeightSpan -> lineHeight
-    // TODO: StyleSpan -> weightText
-    // TODO: ? -> fontStretch
-
     return ret;
 }
 
