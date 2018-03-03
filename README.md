@@ -13,13 +13,3 @@ A sample output would like something like the following
 
 ## How to Install
 Checkout latest code and follow the instruction from official [tutorial](https://github.com/zeplin/zeplin-extension-documentation/blob/master/tutorial.md#adding-a-local-extension).
-
-## TODO
-- [ ] Use [Zero](https://github.com/baybara-pavel/zero) template
-- [ ] Support textAlign (AlignmentSpan)
-- [ ] Support fontStyle->underline (UnderlineSpan)
-- [ ] Support lineHeight (LineHeightSpan)
-- [ ] Support weightText (StyleSpan)
-- [ ] Support fontStretch (?)
-- [ ] StrikethroughSpan equivalent?
-- [ ] BackgroundColorSpan equivalent?
