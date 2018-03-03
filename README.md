@@ -6,7 +6,7 @@ Generates SpannableString snippets from text layers with multiple styles.
   <img src=".github/zeplin-spannable-strings-extension.png" />
 </p>
 
-A sample output would like something like the following
+A sample output would like the following
 <p align="center">
   <img src=".github/zeplin-spannable-strings-extension-sample.png" />
 </p>
